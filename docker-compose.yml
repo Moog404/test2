@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+# TODO : Change the target according to the Dockerfile that you'll set up
+#  app:
+#    build:
+#      target:
+#      context: .
+#    networks:
+#      - frontend
+#      - backend
+#    volumes:
+#      - .:/app
+
+# TODO : Change the database name according to the project
+#  db:
+#    image: mysql:5.7
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=test
+#      - MYSQL_USER=test
+#      - MYSQL_PASSWORD=test
+#      - MYSQL_DATABASE=
+#    volumes:
+#      - db_data:/var/lib/mysql
+#    networks:
+#      - backend
+
+#  mailcatcher:
+#    image: dockage/mailcatcher:0.7.1
+#    ports:
+#      - 1080:1080
+#      - 1025:1025
+#    networks:
+#      - backend
+
+volumes:
+  db_data:
+
+networks:
+  frontend:
+  backend:

@@ -1,0 +1,27 @@
+<?php
+
+$finder = PhpCsFixer\Finder::create()
+    ->in(__DIR__)
+    ->exclude('bin')
+    ->exclude('config')
+    ->exclude('node_modules')
+    ->exclude('public')
+    ->exclude('src/Migrations')
+    ->exclude('var')
+    ->exclude('vendor')
+    ->exclude('spec')
+    ->exclude('tests/behat')
+;
+
+return PhpCsFixer\Config::create()
+    ->setRiskyAllowed(true)
+    ->setRules([
+        '@PhpCsFixer' => true,
+        '@Symfony' => true,
+        'ordered_imports' => true,
+        'no_useless_else' => true,
+        'no_useless_return' => true,
+    ])
+    ->setFinder($finder)
+    ->setCacheFile(__DIR__.'/.php_cs.cache')
+;

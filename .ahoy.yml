@@ -1,0 +1,129 @@
+ahoyapi: v2
+commands:
+  # Docker commands
+  exec:
+    cmd: ahoy dc exec -e SYMFONY_DEPRECATIONS_HELPER=weak app "$@"
+    usage: Exec command into the "app" container
+    hide: true
+
+  dc:
+    cmd: docker-compose "$@"
+    usage: Base docker-compose command
+    hide: true
+
+  tty:
+    cmd: ahoy exec bash
+    usage: Connects to the app container
+
+  build-prod:
+    cmd: docker build --target=app-prod --tag="$@" .
+    usage: Build a container tagged for production with a tag
+
+  start:
+    cmd: ahoy dc up -d "$@"
+    usage: Starts the containers
+
+  start-attached:
+    cmd: ahoy dc up
+    usage: Starts the containers in attached mode
+
+  stop:
+    cmd: ahoy dc stop "$@"
+    usage: Stops the containers
+
+  # App commands
+  exec-bin-console:
+    cmd: ahoy exec php bin/console "$@"
+    usage: Exec a symfony command
+    hide: true
+
+  lint:
+    cmd: |
+      ahoy exec-bin-console lint:twig templates
+      ahoy exec-bin-console lint:yaml config
+    usage: lint the twig templates and yaml config
+
+  php-cs-dry-run:
+    cmd: ahoy exec php -d memory_limit=1024m vendor/bin/php-cs-fixer fix --diff --dry-run --no-interaction -v
+    usage: Dry run of php-cs-fixer
+
+  php-cs-fix:
+    cmd: docker-compose exec -T app php -d memory_limit=1024m vendor/bin/php-cs-fixer fix
+    usage: Run php-cs-fixer
+  ## Tests
+  tests:
+    cmd: docker-compose exec -T -e SYMFONY_DEPRECATIONS_HELPER=weak app php bin/phpunit
+    usage: Run all the tests
+
+  test-complete:
+    cmd : ahoy test-db-refresh && ahoy tests
+    usage: Reset the test database and run all the tests
+
+  cache-clear:
+    cmd: |
+      ahoy exec-bin-console c:c
+      ahoy exec chmod -R 777 var/cache
+      ahoy exec chmod -R 777 var/log
+  ## Database
+  db-reset:
+    cmd: |
+      ahoy exec-bin-console doctrine:database:drop --force --if-exists
+      ahoy exec-bin-console doctrine:database:create --if-not-exists
+      ahoy exec-bin-console doctrine:migrations:migrate -n
+    usage: Reset the dev DB
+
+  db-migrate:
+    cmd: ahoy exec-bin-console d:m:m
+    usage: Run the migrations
+
+  db-diff:
+    cmd: ahoy exec-bin-console doctrine:migration:diff
+    usage: Run the diff command to generate new migration
+
+  db-rollback:
+    cmd: ahoy exec-bin-console doctrine:migration:migrate prev -n
+    usage: Rollback the latest migration
+
+  db-reset-fixtures:
+    cmd: |
+      ahoy db-reset
+      ahoy exec-bin-console doctrine:fixtures:load -n
+    usage: Reset the dev DB and load the fixtures
+
+  test-db-refresh:
+    cmd: |
+      docker-compose exec -T app php bin/console doctrine:d:d --force  -e test
+      docker-compose exec -T app php bin/console doctrine:d:c  -e test
+      docker-compose exec -T app php bin/console doctrine:s:u -f -e test -n
+      docker-compose exec -T app php bin/console doctrine:fixtures:load -n  -e test
+    usage: Reset the test database
+
+  ## Asset management
+  deps:
+    cmd: |
+      docker-compose exec -T -e COMPOSER_MEMORY_LIMIT=-1 app composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+      docker-compose exec -T app php bin/console assets:install public
+    usage: Install php dependencies (composer and other assets)
+
+  perms:
+    cmd: |
+      ahoy exec chmod -R 777 var/cache
+      ahoy exec chmod -R 777 var/log
+      ahoy exec chmod -R 777 public/uploads
+    usage: setup permissions for log, uploads and cache directories
+
+  compilejs:
+    cmd: |
+      docker-compose exec -T app npm install
+      docker-compose exec -T app npm run build
+
+  init:
+    cmd: |
+      symfony new temp --full --no-git
+      mv -v {temp/*,temp/.*} .
+      rm README.md
+      mv README.md.dist README.md
+      git add .
+      git commit -m "init Symfony"
+      git push
+    usage: init the symfony application in your local repository

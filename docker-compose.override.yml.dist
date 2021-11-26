@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  app:
+    ports:
+      - 80:80
+
+#  phpmyadmin:
+#    image: phpmyadmin/phpmyadmin
+#    ports:
+#      - 81:80
+#    links:
+#      - db:db
+#    environment:
+#      PMA_HOST: db
+#      PMA_PORT: 3306
+#    networks:
+#      - backend
