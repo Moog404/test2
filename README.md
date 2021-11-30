@@ -1,32 +1,71 @@
-# Template Repository for Symfony Web Applications
+## Introduction
 
-## Initialise your repository
-This a template repository. You can create another repository from this one by selecting the `use this template` button.
+Here, you have to write 4 sentences maximum to provide a clear description of the project.
+What are the goals, who should use it.
 
-Your new repository will have the same structure as this one
+## Requirements
 
-## Initialise Symfony
-Once you have created your Repository from this template use the command directly in your terminal :
-```bash
-$ ahoy init
-```
-**This command requires the [Symfony CLI](https://symfony.com/download). You need to have it installed !**
+* php >= <version>
+* Symfony >= <version>
+* Docker & docker-compose
+* [Node.js](https://nodejs.org/en/)
+* [npm](https://nodejs.org/en/)
+* [GitHub Packages Token](https://wiki.namkin.fr/dev/dev-env/general)
 
-Do not forget to change the .dist files by deleting the .dist extension :
-* ./.github/workflows/release.yaml.dist -> This is the CI for automated build of the app with Github Actions
-* ./docker-compose.override.yaml.dist
+## Installation
 
-Do not forget to check all TODOs :
-* ./.github/worflows/release.yaml.dist
-* ./docker-compose.yaml
-* ./Dockerfile
+### docker-compose.yaml
+To install this project, clone this project on your device. Rename the `docker-compose.override.yml.dist` file to `docker-compose.override.yml`.
+In the override file, you are able to change the port you want to use to run this project.
 
-## Initialise Docker
-In this template, the `Dockerfile` is empty. You can use any Dockerfile you want. For every Namkin, you can use the base one available in any projects (take the latest one). With the default `Dockerfile`, you have to import the `docker` folder with the `nginx.conf` of the same project.
+### Install container
+You can now install the containers thanks to **docker-compose**. The first time, it will install your environment on your containers.
 
-Then you have to uncomment the services you want in the `docker-compose.yaml`. Be careful, the `target: ` cannot be empty : if you use the default Dockerfile, you can set it to `dev` by default. The "TODOs" are here to help you.
+    docker-compose up -d
 
-Now, you can build your project locally
-```
-$ docker-compose up -d --build
-```
+### Install php bundles
+You can now access your containers with `docker-compose exec <container_name> bash` or use `ahoy tty` to access your _app_ container. Once you are in this container, you have to install Symfony and all its dependencies (that are listed in the `package.json` file). To do this you only have to do :
+
+    composer install
+
+### Environment variables
+You need to set up the environment variables in the `.env` file (you can create a `.env.local` to override the `.env` configuration only on your device) :
+
+`.env` variable | Default Value | Details
+--------------- | ------------- | -------
+`DATABASE_URL` | `mysql://root:test@db:3306/<project_name>-site` | This is the url of your database.
+`ANOTHER_ENV_VAR` | `<default_value>` | Provide a short description of this variable
+
+### Commands
+
+| Command | Description | Comments |
+| --- | --- | --- |
+| `npm run serve` | Compiles and hot-reloads for development | - |
+| `npm run build` | Compiles and minifies for production | - |
+| `npm run dev` | Compiles and minifies back-end assets | - |
+| `npm run dev` | Compiles and hot-reloads back-end assets | - |
+
+Once you have everything set up, you are able to access your projet locally, on the port you have set up in `docker-compose.yaml`
+
+## Deployment
+
+With Docker, we can build images and push as we want. We have implemented a Continuous Integration (aka. CI) to make this task faster and easier: on each successful release on the Github Repository, the CI will build an image and push it on our Registry.
+
+To deploy the newest version of the project on your server, you only have to make a `docker-compose.yaml` file and set up the app container with the version of your choice of the image on the registry. You can always have the latest version of the project thanks to the tag `:latest`.
+
+Then you have to pull the chosen image from the registry :
+
+    docker pull gcr.io/namkin/<project-name>:<tag>
+
+And you can run
+
+    docker-compose up -d
+
+## Configuration
+
+Optional informations about the customization you can have to configure the project with examples.
+
+## Further Documentation
+
+You can check the documentation of the bundle we use:
+* [Symfony](https://symfony.com/doc/current/index.html)
